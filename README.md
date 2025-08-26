@@ -47,7 +47,7 @@ Para verificar los formatos compatibles de tu cámara utiliza el siguiente coman
 v4l2-ctl --device=/dev/video2 --list-formats-ext
 
 ```
-De esta manera sabes que formato ocupa tu camara y a que frame rate trabaja. Si quieres verificar que la cámara efectivamente corre a la resolución que escogiste, puedes ocupar el siguiente comando después de correr el launcher.
+De esta manera sabes que formato ocupa tu cámara y a que frame rate trabaja. Si quieres verificar que la cámara efectivamente corre a la resolución que escogiste, puedes ocupar el siguiente comando después de correr el launcher.
 
 ```
 v4l2-ctl --device=/dev/video2 --get-fmt-video
