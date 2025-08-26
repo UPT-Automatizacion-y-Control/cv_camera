@@ -1,6 +1,7 @@
-# cv_camera 
+# cv_camera modificado
+Este paquete se ha probado en ROS2 Jazzy en Ubuntu 24.04. 
 
-Este paquete está basado en este [repositorio](https://github.com/Kapernikov/cv_camera) del cual sólo se ha ajustado la declaración de algunas librerías para que no marque un error a la hora de compilar en ROS2 Jazzy Jalisco. 
+Este paquete está basado en este [repositorio](https://github.com/Kapernikov/cv_camera) del cual se ha modificado el codigo fuente para poder añadir una opción de escoger el formato de la cámara, ya sea MJPG o YUYV.
 
 Este paquete ocupa [camera_info_manager](http://wiki.ros.org/camera_info_manager), si no se establecen datos de calibración, tendrá valores ficticios excepto el ancho y la altura.
 
@@ -14,4 +15,29 @@ Al igual que asegurarse que se tengan instaladas las dependencias del paquete al
 ```
 sudo apt update
 rosdep install -i --from-path src --rosdistro jazzy -y
+```
+# Launcher recomendado
+El launcher recomendado para utilizar este paquete es el siguiente:
+```
+from launch import LaunchDescription
+from launch_ros.actions import Node
+
+def generate_launch_description():
+    return LaunchDescription([
+        Node(
+            package='cv_camera',
+            executable='cv_camera_node',
+            parameters=[
+                {"device_path": "/dev/video2"},
+                {"device_id": 2},
+                {"frame_id": "webcam"}, 
+                {"image_width": 1920},
+                {"image_height": 1080},
+                {"rate": 30.0},
+                {"pixel_format": "MJPG"},  # <-- MJPG o YUYV
+                {"camera_info_url": ""}
+            ]
+        )
+    ])
+
 ```

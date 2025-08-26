@@ -1,5 +1,3 @@
-// Copyright [2015] Takashi Ogura<t.ogura@gmail.com>
-
 #include "cv_camera/capture.h"
 #include <sstream>
 #include <string>
@@ -64,7 +62,6 @@ void Capture::rescaleCameraInfo(uint width, uint height)
   info_.width = width;
   info_.height = height;
 
-  // See http://docs.ros.org/api/sensor_msgs/html/msg/CameraInfo.html for clarification
   info_.k[0] *= width_coeff;
   info_.k[2] *= width_coeff;
   info_.k[4] *= height_coeff;
@@ -81,12 +78,12 @@ void Capture::open(int32_t device_id)
   cap_.open(device_id);
   if (!cap_.isOpened())
   {
-    std::stringstream stream;
-    stream << "device_id" << device_id << " cannot be opened";
-    throw DeviceError(stream.str());
+    throw DeviceError("device_id " + std::to_string(device_id) + " cannot be opened");
   }
-  pub_ = it_.advertiseCamera(topic_name_, buffer_size_);
 
+  configureFormat();  // NUEVO
+
+  pub_ = it_.advertiseCamera(topic_name_, buffer_size_);
   loadCameraInfo();
 }
 
@@ -97,8 +94,10 @@ void Capture::open(const std::string &device_path)
   {
     throw DeviceError("device_path " + device_path + " cannot be opened");
   }
-  pub_ = it_.advertiseCamera(topic_name_, buffer_size_);
 
+  configureFormat();  // NUEVO
+
+  pub_ = it_.advertiseCamera(topic_name_, buffer_size_);
   loadCameraInfo();
 }
 
@@ -112,13 +111,37 @@ void Capture::openFile(const std::string &file_path)
   cap_.open(file_path);
   if (!cap_.isOpened())
   {
-    std::stringstream stream;
-    stream << "file " << file_path << " cannot be opened";
-    throw DeviceError(stream.str());
+    throw DeviceError("file " + file_path + " cannot be opened");
   }
-  pub_ = it_.advertiseCamera(topic_name_, buffer_size_);
 
+  pub_ = it_.advertiseCamera(topic_name_, buffer_size_);
   loadCameraInfo();
+}
+
+void Capture::configureFormat()
+{
+  std::string format;
+  if (node_->get_parameter("pixel_format", format))
+  {
+    if (format == "MJPG")
+    {
+      cap_.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
+      RCLCPP_INFO(node_->get_logger(), "Using MJPG format");
+    }
+    else if (format == "YUYV")
+    {
+      cap_.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('Y', 'U', 'Y', 'V'));
+      RCLCPP_INFO(node_->get_logger(), "Using YUYV format");
+    }
+    else
+    {
+      RCLCPP_WARN(node_->get_logger(), "Unknown format '%s', using default", format.c_str());
+    }
+  }
+  else
+  {
+    RCLCPP_INFO(node_->get_logger(), "No pixel_format parameter provided, using default");
+  }
 }
 
 bool Capture::capture()
