@@ -35,7 +35,7 @@ def generate_launch_description():
                 {"image_height": 1080},
                 {"rate": 30.0},
                 {"pixel_format": "MJPG"},  # <-- MJPG o YUYV
-                {"camera_info_url": ""}
+                {"camera_info_url": "file:///home/your_profile/calibrationdata/your_archive.yaml"}
             ]
         )
     ])
