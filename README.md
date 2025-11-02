@@ -53,7 +53,7 @@ De esta manera sabes que formato ocupa tu cámara y a que frame rate trabaja. Si
 v4l2-ctl --device=/dev/video2 --get-fmt-video
 
 ```
-Si quieres compropbar el frame rate:
+Si quieres comprobar el frame rate:
 
 ```
 v4l2-ctl --device=/dev/video2 --get-parm
